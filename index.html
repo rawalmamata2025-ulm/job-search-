@@ -176,6 +176,14 @@ body{background:var(--bg);color:var(--ink);}
       <div class="alert" style="background:var(--teal-light);color:var(--teal-dark);border:none;border-radius:12px;font-size:13px;">
         These buttons open <b>real, live search results</b> on each site's own current listings — filtered for "New Grad RN Residency." Nothing here is fabricated; you're browsing the actual site.
       </div>
+
+      <div class="card p-3 p-md-4 mb-4">
+        <h2 class="h6 mb-2">🔖 One-click Job Clipper</h2>
+        <p class="small text-secondary mb-3">Drag this button to your bookmarks bar. Next time you're looking at a real job on LinkedIn or Indeed (logged in, as yourself), click it — it reads the title, company, location, and description that are already on your screen and copies them as ready-to-paste job data. It never runs in the background, never logs in for you, and never touches any page you haven't opened yourself.</p>
+        <a href="#" id="bookmarkletLink" class="btn btn-navy btn-sm align-self-start" onclick="return false;" ondragstart="event.dataTransfer.setData('text/uri-list', this.href); event.dataTransfer.setData('text/plain', this.href);">📎 Clip This Job</a>
+        <p class="small text-secondary mt-2 mb-0">Then on this dashboard: <b>Tracked Jobs → + Add Job → Paste from Clipboard</b>. Selectors are best-effort and may miss a field if LinkedIn/Indeed changes their page layout — always glance over what gets filled in before saving.</p>
+      </div>
+
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-4" id="searchLinksGrid"></div>
 
       <div class="card p-3 p-md-4">
@@ -265,6 +273,9 @@ body{background:var(--bg);color:var(--ink);}
       <h2 class="h6 mb-3">⚙️ Settings</h2>
       <div class="card p-3 p-md-4">
         <div class="row g-3" id="settingsForm"></div>
+        <div class="alert mt-3 mb-0" style="background:var(--amber-light);color:#8A5B00;border:none;border-radius:10px;font-size:12.5px;">
+          ⚠️ Email lookup uses Hunter.io's Email Finder, called directly from your browser with your own API key (get one free at <a href="https://hunter.io" target="_blank" rel="noopener">hunter.io</a>). Results are pattern-based guesses Hunter assigns a confidence score to — always verify before relying on one. Your key is stored only in this browser's local storage and is never sent anywhere except Hunter.io.
+        </div>
         <div class="d-flex gap-2 flex-wrap mt-3">
           <button class="btn btn-sm btn-navy" onclick="saveSettings()">Save Settings</button>
           <button class="btn btn-sm btn-outline-secondary" onclick="exportBackup()">⬇️ Export My Data</button>
@@ -284,6 +295,7 @@ body{background:var(--bg);color:var(--ink);}
       <div class="modal-header"><h5 class="modal-title">Add a Job You Found</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <p class="small text-secondary">Paste details from the real LinkedIn / Indeed / hospital posting. Leave OPT or Sponsorship as "Not stated" unless the posting explicitly says so — never guess.</p>
+        <button class="btn btn-outline-secondary btn-sm mb-3" onclick="pasteFromClipboard()">📋 Paste from Clipboard (from Job Clipper)</button>
         <div class="row g-2" id="addJobForm"></div>
       </div>
       <div class="modal-footer">
@@ -349,7 +361,7 @@ const DEFAULT_SETTINGS = {
   name:"Mamata Rawal", email:"rawalmamata2027@gmail.com", phone:"341-758-1062",
   graduation:"December 2026", university:"University of Louisiana Monroe",
   degree:"BSN", targetRole:"New Grad RN", targetStates:"LA, TX, GA, TN, SC, MI, MO",
-  optStatus:"F-1 OPT", sponsorshipPref:"EB-3 preferred"
+  optStatus:"F-1 OPT", sponsorshipPref:"EB-3 preferred", hunterApiKey:""
 };
 
 const RESUME_TEXT = {
@@ -489,7 +501,8 @@ function jobCardHTML(job){
   const optLine = job.optStatus === 'Explicit' ? `<span class="status-ok">✅ Explicitly accepted</span>` : `<span class="status-warn">⚠️ OPT not verified</span>`;
   const sponsorLine = job.sponsorshipStatus === 'Explicit' ? `<span class="status-ok">✅ ${escapeHTML(job.sponsorshipType || 'Sponsorship confirmed')}</span>` : `<span class="status-warn">⚠️ Sponsorship not verified</span>`;
   const evidence = job.sponsorshipEvidence ? `<div class="evidence mb-2">"${escapeHTML(job.sponsorshipEvidence)}"</div>` : '';
-  const recruiterBlock = job.recruiterName ? `<div class="recruiter-mini mb-2"><b>${escapeHTML(job.recruiterName)}</b><br>${escapeHTML(job.recruiterTitle||'')}</div>` : `<div class="recruiter-mini mb-2 text-secondary">Recruiter not verified</div>`;
+  const confNote = job.recruiterEmailConfidence!=null ? ` <span class="text-secondary">(email confidence ${job.recruiterEmailConfidence}% — verify)</span>` : '';
+  const recruiterBlock = job.recruiterName ? `<div class="recruiter-mini mb-2"><b>${escapeHTML(job.recruiterName)}</b><br>${escapeHTML(job.recruiterTitle||'')}${confNote}</div>` : `<div class="recruiter-mini mb-2 text-secondary">Recruiter not verified</div>`;
 
   return `
   <div class="col">
@@ -512,6 +525,7 @@ function jobCardHTML(job){
       <button class="btn btn-navy btn-sm" onclick="startApply(${job.id})" ${app && app.status!=='New'?'disabled':''}>${app? 'Applied ✓':'Apply'}</button>
       ${job.recruiterLinkedIn ? `<a class="btn btn-outline-secondary btn-sm" href="${job.recruiterLinkedIn}" target="_blank" rel="noopener">LinkedIn</a>` : `<button class="btn btn-outline-secondary btn-sm" disabled>LinkedIn n/a</button>`}
       ${job.recruiterEmail ? `<button class="btn btn-outline-secondary btn-sm" onclick="emailRecruiter(${job.id})">Email</button>` : `<button class="btn btn-outline-secondary btn-sm" disabled>Email n/a</button>`}
+      ${!job.recruiterEmail && job.recruiterName ? `<button class="btn btn-outline-secondary btn-sm" onclick="findRecruiterEmail(${job.id})">🔍 Find Email</button>` : ''}
       <button class="btn ${isSaved?'btn-danger':'btn-outline-secondary'} btn-sm" onclick="toggleSave(${job.id})">${isSaved?'Remove':'Save'}</button>
     </div>
     <div class="d-flex flex-wrap gap-1">
@@ -766,12 +780,62 @@ function emailRecruiter(jobId){
 }
 
 /* =========================================================================
+   RECRUITER EMAIL LOOKUP (Hunter.io Email Finder — user's own API key)
+   ========================================================================= */
+async function findRecruiterEmail(jobId){
+  const job = jobs.find(j=>j.id===jobId);
+  if(!job){ return; }
+  const key = settings.hunterApiKey;
+  if(!key){ toast('Add your Hunter.io API key in Settings first'); goPage('settings'); return; }
+  if(!job.hospitalDomain){ toast('Add this job\'s hospital website domain first (edit not yet supported — re-add the job with a domain)'); return; }
+  if(!job.recruiterName){ toast('Add a recruiter name first'); return; }
+  const parts = job.recruiterName.trim().split(/\s+/);
+  const first = parts[0], last = parts.length>1 ? parts[parts.length-1] : '';
+  toast('Looking up email via Hunter.io…');
+  try{
+    const url = `https://api.hunter.io/v2/email-finder?domain=${encodeURIComponent(job.hospitalDomain)}&first_name=${encodeURIComponent(first)}&last_name=${encodeURIComponent(last)}&api_key=${encodeURIComponent(key)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(data.errors){ toast('Hunter.io error: ' + (data.errors[0]?.details || data.errors[0]?.code || 'lookup failed')); return; }
+    const email = data.data && data.data.email;
+    if(!email){ toast('No email found for this name/domain'); return; }
+    job.recruiterEmail = email;
+    job.recruiterEmailConfidence = data.data.score;
+    save(LS.jobs, jobs);
+    renderAll();
+    toast(`Found: ${email} (confidence ${data.data.score ?? '—'}%) — verify before relying on it`);
+  }catch(err){
+    toast('Lookup failed — check your API key, domain, or network connection');
+  }
+}
+
+/* =========================================================================
+   PASTE FROM CLIPBOARD (fed by the Job Clipper bookmarklet)
+   ========================================================================= */
+async function pasteFromClipboard(){
+  try{
+    const text = await navigator.clipboard.readText();
+    const data = JSON.parse(text);
+    const setIf = (key, val) => { const el = document.getElementById('add_'+key); if(el && val) el.value = val; };
+    setIf('hospital', data.hospital);
+    setIf('position', data.position);
+    setIf('location', data.location);
+    setIf('jobUrl', data.jobUrl);
+    setIf('sponsorshipEvidence', data.description ? ('DESCRIPTION (review — not auto-classified as OPT/sponsorship evidence):\n' + data.description) : '');
+    toast('Pasted from clipboard — review every field before saving');
+  }catch(err){
+    toast('Nothing usable on clipboard — click 📎 Clip This Job on a real posting first');
+  }
+}
+
+/* =========================================================================
    ADD JOB (manual — for real postings the user found themselves)
    ========================================================================= */
 const ADD_JOB_FIELDS = [
   ['hospital','Hospital / System *','text',12],['position','Position Title *','text',12],
   ['location','City, State','text',6],['state','State','text',6],
   ['department','Department','text',6],['cohort','Cohort (e.g. Spring 2027)','text',6],
+  ['hospitalDomain','Hospital website domain (e.g. hcahealthcare.com) — used for email lookup','text',12],
   ['employmentType','Employment Type','select:Full-time,Part-time',6],
   ['optStatus','OPT Status','select:Not stated,Explicit',6],
   ['sponsorshipStatus','Sponsorship Status','select:Not stated,Explicit',6],
@@ -799,6 +863,7 @@ function submitAddJob(){
   const job = {
     id: maxId+1, source:'Manual', status:'New',
     hospital, position, location:get('location'), state:get('state'), department:get('department'),
+    hospitalDomain:get('hospitalDomain'),
     cohort:get('cohort'), employmentType:get('employmentType')||'Full-time',
     optStatus:get('optStatus')||'Not stated', sponsorshipStatus:get('sponsorshipStatus')||'Not stated',
     sponsorshipType:get('sponsorshipType'), sponsorshipEvidence:get('sponsorshipEvidence'),
@@ -874,7 +939,8 @@ function importBackupFile(evt){
 const SETTINGS_FIELDS = [
   ['name','Name'], ['email','Email'], ['phone','Phone'], ['graduation','Graduation Date'],
   ['university','University'], ['degree','Degree'], ['targetRole','Target Role'],
-  ['targetStates','Target States'], ['optStatus','OPT Status'], ['sponsorshipPref','Sponsorship Preference']
+  ['targetStates','Target States'], ['optStatus','OPT Status'], ['sponsorshipPref','Sponsorship Preference'],
+  ['hunterApiKey','Hunter.io API Key (for email lookup)']
 ];
 function renderSettingsForm(){
   document.getElementById('settingsForm').innerHTML = SETTINGS_FIELDS.map(([key,label])=>`
@@ -909,6 +975,42 @@ function renderResume(){
 }
 
 /* =========================================================================
+   JOB CLIPPER BOOKMARKLET
+   Reads only what's already rendered on the current LinkedIn/Indeed job page
+   the user is manually viewing. Makes no network requests, logs in for no
+   one, and runs only on explicit click — not a background scraper.
+   ========================================================================= */
+function buildBookmarklet(){
+  const src = `(function(){
+    function q(sels){ for(var i=0;i<sels.length;i++){ var el=document.querySelector(sels[i]); if(el && el.innerText && el.innerText.trim()) return el.innerText.trim(); } return ''; }
+    var host = location.hostname;
+    var data = { jobUrl: location.href, source: host.indexOf('linkedin')>-1 ? 'LinkedIn' : (host.indexOf('indeed')>-1 ? 'Indeed' : host) };
+    if(host.indexOf('linkedin')>-1){
+      data.position = q(['.job-details-jobs-unified-top-card__job-title','h1']);
+      data.hospital = q(['.job-details-jobs-unified-top-card__company-name a','.job-details-jobs-unified-top-card__company-name']);
+      data.location = q(['.job-details-jobs-unified-top-card__bullet']);
+      data.description = q(['#job-details','.jobs-description__content']).slice(0,2500);
+    } else if(host.indexOf('indeed')>-1){
+      data.position = q(['h1.jobsearch-JobInfoHeader-title','h1']);
+      data.hospital = q(['[data-testid="inlineHeader-companyName"]','.jobsearch-CompanyInfoContainer a']);
+      data.location = q(['[data-testid="inlineHeader-companyLocation"]']);
+      data.description = q(['#jobDescriptionText']).slice(0,2500);
+    } else {
+      data.position = q(['h1']);
+      data.description = document.title;
+    }
+    var json = JSON.stringify(data, null, 2);
+    function done(msg){ alert(msg); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(json).then(function(){ done('Job data copied! Go to your dashboard \\u2192 Tracked Jobs \\u2192 + Add Job \\u2192 Paste from Clipboard.'); }, function(){ window.prompt('Copy this manually:', json); });
+    } else {
+      window.prompt('Copy this manually:', json);
+    }
+  })();`;
+  return 'javascript:' + encodeURIComponent(src.replace(/\s+/g,' '));
+}
+
+/* =========================================================================
    INIT
    ========================================================================= */
 function init(){
@@ -918,6 +1020,8 @@ function init(){
   renderSettingsForm();
   renderResume();
   renderAll();
+  const bk = document.getElementById('bookmarkletLink');
+  if(bk) bk.href = buildBookmarklet();
 }
 init();
 </script>
