@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mamata's New Grad RN Job Agent</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B2545;
+  --navy-2:#123A63;
+  --blue:#1B6FA8;
+  --blue-light:#E5F0F8;
+  --teal:#2EC4B6;
+  --teal-light:#E3F9F7;
+  --teal-dark:#04302B;
+  --amber:#D98E04;
+  --amber-light:#FBF0DA;
+  --red:#C6493F;
+  --red-light:#FBEAE8;
+  --bg:#F5F8FA;
+  --border:#E1E7ED;
+  --ink:#132239;
+  --ink-soft:#4C5C70;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --bs-body-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+body{background:var(--bg);color:var(--ink);}
+
+/* ---- Sidebar ---- */
+#sidebar{
+  background:linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 100%);
+  color:#EAF1FA;
+  min-height:100vh;
+  padding:20px 14px;
+  width:230px;
+  flex:0 0 230px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 6px 20px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:12px;}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.brand-text b{display:block;font-size:14px;}
+.brand-text span{display:block;font-size:11px;color:#9FB4CC;}
+.nav-link.custom{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#C9D8EA !important;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:2px;}
+.nav-link.custom:hover{background:rgba(255,255,255,.07);color:#fff !important;}
+.nav-link.custom.active{background:var(--teal);color:var(--teal-dark) !important;font-weight:700;}
+.sidebar-foot{margin-top:24px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#7F93AB;line-height:1.5;}
+#sidebarOffcanvas{background:linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 100%);width:250px;}
+#sidebarOffcanvas .btn-close{filter:invert(1);}
+
+/* ---- Layout shell ---- */
+.shell{display:flex;min-height:100vh;}
+.main-col{flex:1 1 auto;min-width:0;padding:22px 26px 60px;}
+@media (max-width:991.98px){
+  #sidebar{display:none;}
+  .main-col{padding:16px 14px 50px;}
+}
+
+/* ---- Vitals ---- */
+.vitals{position:relative;background:var(--navy);border-radius:14px;padding:18px 18px 14px;overflow:hidden;}
+.vitals-line{position:absolute;inset:0;opacity:.35;pointer-events:none;}
+.vitals-line svg{width:200%;height:100%;animation:scrollLine 9s linear infinite;}
+@media (prefers-reduced-motion:reduce){.vitals-line svg{animation:none;}}
+@keyframes scrollLine{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.vital{position:relative;z-index:1;color:#DCE8F5;text-align:center;}
+.vital .num{font-family:var(--mono);font-size:22px;font-weight:700;color:#fff;}
+.vital .lbl{font-size:10.5px;color:#9FB4CC;text-transform:uppercase;letter-spacing:.03em;}
+
+/* ---- Cards ---- */
+.card{border:1px solid var(--border);border-radius:14px;}
+.job-card .badge-match{font-family:var(--mono);font-weight:700;font-size:12.5px;padding:5px 10px;border-radius:8px;}
+.match-excellent{background:var(--red-light);color:#B33A2B;}
+.match-strong{background:var(--teal-light);color:#1A8177;}
+.match-possible{background:var(--amber-light);color:#8A5B00;}
+.match-low{background:#EEF1F4;color:#8A97A5;}
+.job-hospital{color:var(--blue);font-weight:600;font-size:13.5px;}
+.status-ok{color:#1A8177;font-weight:600;}
+.status-warn{color:#B87500;font-weight:600;}
+.evidence{background:#F7F9FB;border-left:3px solid var(--blue);padding:8px 10px;font-size:12px;color:var(--ink-soft);border-radius:0 8px 8px 0;font-style:italic;}
+.recruiter-mini{font-size:12.5px;color:var(--ink-soft);border-top:1px dashed var(--border);padding-top:8px;}
+.badge-source{position:absolute;top:12px;right:12px;font-size:10px;}
+.pill-info{background:var(--blue-light);color:var(--blue);}
+
+.btn-teal{background:var(--teal);color:var(--teal-dark);border:none;font-weight:600;}
+.btn-teal:hover{background:#25b0a3;color:var(--teal-dark);}
+.btn-navy{background:var(--navy);color:#fff;border:none;}
+.btn-navy:hover{background:var(--navy-2);color:#fff;}
+
+.resume-doc h2{font-size:20px;margin-bottom:2px;}
+.resume-doc h4{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);border-bottom:1px solid var(--border);padding-bottom:4px;margin:18px 0 8px;}
+.resume-doc .job-line{display:flex;justify-content:space-between;font-weight:700;margin-top:8px;font-size:13.5px;}
+.resume-doc .job-loc{font-weight:400;color:var(--ink-soft);font-size:12px;}
+@media print{
+  #sidebar,.no-print,.navbar{display:none !important;}
+  .main-col{padding:0;}
+}
+
+.toast-custom{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:all .25s ease;z-index:1200;box-shadow:0 8px 24px rgba(11,37,69,.3);}
+.toast-custom.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.flag-list li{margin-bottom:6px;}
+.search-link-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;height:100%;}
+</style>
+</head>
+<body>
+
+<!-- Mobile top navbar -->
+<nav class="navbar d-lg-none" style="background:var(--navy);">
+  <div class="container-fluid">
+    <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">☰</button>
+    <span class="navbar-brand text-white ms-2 mb-0 h6">🩺 RN Job Agent</span>
+  </div>
+</nav>
+
+<!-- Mobile offcanvas sidebar -->
+<div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebarOffcanvas">
+  <div class="offcanvas-header">
+    <span class="h6 mb-0">🩺 RN Job Agent</span>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body p-2" id="navListMobile"></div>
+</div>
+
+<div class="shell">
+  <aside id="sidebar" class="d-none d-lg-flex flex-column">
+    <div class="brand">
+      <div class="brand-mark">🩺</div>
+      <div class="brand-text"><b>RN JOB AGENT</b><span>Mamata Rawal</span></div>
+    </div>
+    <div id="navListDesktop"></div>
+    <div class="sidebar-foot">December 2026 BSN<br>F-1 OPT · EB-3 preferred<br>All data stays in this browser.</div>
+  </aside>
+
+  <main class="main-col">
+    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+      <div>
+        <h1 class="h4 mb-1" id="pageTitle">🩺 Mamata's New Grad RN Job Agent</h1>
+        <p class="text-secondary small mb-0" id="pageSub">December 2026 BSN • F-1 OPT • New Grad RN Search</p>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="vitals mb-4">
+      <div class="vitals-line">
+        <svg viewBox="0 0 600 60" preserveAspectRatio="none"><polyline points="0,30 40,30 55,10 70,50 85,30 130,30 145,15 160,45 175,30 260,30 275,10 290,50 305,30 400,30 415,15 430,45 445,30 600,30" fill="none" stroke="#2EC4B6" stroke-width="2"/><polyline points="600,30 640,30 655,10 670,50 685,30 730,30 745,15 760,45 775,30 860,30 875,10 890,50 905,30 1000,30 1015,15 1030,45 1045,30 1200,30" fill="none" stroke="#2EC4B6" stroke-width="2"/></svg>
+      </div>
+      <div class="row row-cols-3 row-cols-md-6 g-3 text-center position-relative">
+        <div class="col"><div class="vital"><div class="num" id="statNew">0</div><div class="lbl">New Jobs</div></div></div>
+        <div class="col"><div class="vital"><div class="num" id="statStrong">0</div><div class="lbl">Strong Matches</div></div></div>
+        <div class="col"><div class="vital"><div class="num" id="statOptSpon">0</div><div class="lbl">OPT + Sponsor</div></div></div>
+        <div class="col"><div class="vital"><div class="num" id="statReady">0</div><div class="lbl">Apps Ready</div></div></div>
+        <div class="col"><div class="vital"><div class="num" id="statSubmitted">0</div><div class="lbl">Submitted</div></div></div>
+        <div class="col"><div class="vital"><div class="num" id="statInterview">0</div><div class="lbl">Interviews</div></div></div>
+      </div>
+    </div>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section id="page-dashboard" class="page">
+      <div class="alert mb-4" style="background:var(--blue-light);color:var(--navy);border:none;border-radius:12px;font-size:13px;">
+        📅 Last updated: <b id="lastUpdated">—</b> · This file has no live internet access — click <b>Find Live Jobs</b> to search LinkedIn/Indeed yourself, then use <b>Add Job</b> to save the ones worth tracking.
+      </div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h6 mb-0">🎯 Top Matches</h2>
+        <button class="btn btn-sm btn-outline-secondary" onclick="goPage('matches')">View all</button>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-4" id="dashTopMatches"></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h6 mb-0">Your Tracked Jobs</h2>
+        <button class="btn btn-sm btn-teal" onclick="goPage('newjobs')">+ Add / Find Jobs</button>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="dashRecent"></div>
+    </section>
+
+    <!-- ================= FIND LIVE JOBS ================= -->
+    <section id="page-findjobs" class="page" style="display:none;">
+      <div class="alert" style="background:var(--teal-light);color:var(--teal-dark);border:none;border-radius:12px;font-size:13px;">
+        These buttons open <b>real, live search results</b> on each site's own current listings — filtered for "New Grad RN Residency." Nothing here is fabricated; you're browsing the actual site.
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-4" id="searchLinksGrid"></div>
+
+      <div class="card p-3 p-md-4">
+        <h2 class="h6 mb-3">⚠️ Avoiding fake recruiters / scam listings</h2>
+        <ul class="flag-list small text-secondary mb-0">
+          <li>Genuine hospital recruiters use a company email domain (e.g. <code>@hcahealthcare.com</code>), never Gmail/Yahoo/Outlook for official offers.</li>
+          <li>No legitimate employer ever asks you to pay for training, equipment, or "processing fees" before you're hired.</li>
+          <li>Be wary of postings with vague hospital names, no address, or that push you to chat entirely off-platform (WhatsApp/Telegram) within the first message.</li>
+          <li>Verify the recruiter's LinkedIn: real recruiters usually have a full work history, mutual connections, and are listed on the hospital's own careers page or staff directory.</li>
+          <li>Confirm a posting is real by searching the hospital's own official career site for the same role before applying.</li>
+          <li>Never share your SSN, bank details, or passport/visa documents until you have a signed, verifiable offer from the hospital's official HR system.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= NEW JOBS / TRACKED ================= -->
+    <section id="page-newjobs" class="page" style="display:none;">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 class="h6 mb-0">Tracked Jobs</h2>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm btn-teal" onclick="openAddJobModal()">+ Add Job</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
+          <input type="file" id="importFile" accept=".json" class="d-none" onchange="importJobsFile(event)">
+          <button class="btn btn-sm btn-outline-secondary" onclick="exportJobsJSON()">⬇️ Export JSON</button>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+        <input type="text" id="searchBox" class="form-control form-control-sm" style="max-width:220px;" placeholder="Search hospital, position, city..." oninput="renderAll()">
+        <select id="fState" class="form-select form-select-sm" style="max-width:150px;" onchange="renderAll()"><option value="">All States</option></select>
+        <select id="fDept" class="form-select form-select-sm" style="max-width:170px;" onchange="renderAll()"><option value="">All Departments</option></select>
+        <select id="fCohort" class="form-select form-select-sm" style="max-width:150px;" onchange="renderAll()"><option value="">All Cohorts</option></select>
+        <select id="fOpt" class="form-select form-select-sm" style="max-width:170px;" onchange="renderAll()"><option value="">OPT: Any</option><option value="Explicit">OPT: Explicit only</option></select>
+        <select id="fSponsor" class="form-select form-select-sm" style="max-width:190px;" onchange="renderAll()"><option value="">Sponsorship: Any</option><option value="Explicit">Sponsorship: Explicit only</option></select>
+        <select id="fScore" class="form-select form-select-sm" style="max-width:150px;" onchange="renderAll()">
+          <option value="0">Score: Any</option><option value="90">90+ Excellent</option><option value="80">80+ Strong</option><option value="70">70+ Possible</option>
+        </select>
+        <div class="form-check ms-1">
+          <input class="form-check-input" type="checkbox" id="strictToggle" onchange="renderAll()">
+          <label class="form-check-label small" for="strictToggle">Only explicit OPT + Sponsorship</label>
+        </div>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="newJobsGrid"></div>
+    </section>
+
+    <!-- ================= BEST MATCHES ================= -->
+    <section id="page-matches" class="page" style="display:none;">
+      <h2 class="h6 mb-3">🎯 Best Matches (80%+)</h2>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="matchesGrid"></div>
+    </section>
+
+    <!-- ================= SAVED ================= -->
+    <section id="page-saved" class="page" style="display:none;">
+      <h2 class="h6 mb-3">⭐ Saved Jobs</h2>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="savedGrid"></div>
+    </section>
+
+    <!-- ================= APPLICATIONS ================= -->
+    <section id="page-applications" class="page" style="display:none;">
+      <h2 class="h6 mb-3">📋 Application Tracker</h2>
+      <div class="table-responsive card p-0">
+        <table class="table table-sm mb-0 align-middle">
+          <thead class="table-light"><tr>
+            <th>Hospital</th><th>Position</th><th>Location</th><th>Applied</th><th>Status</th><th>Recruiter</th><th>Follow-up</th><th>Notes</th>
+          </tr></thead>
+          <tbody id="appsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= RECRUITERS ================= -->
+    <section id="page-recruiters" class="page" style="display:none;">
+      <h2 class="h6 mb-3">👥 Recruiters</h2>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="recruitersGrid"></div>
+    </section>
+
+    <!-- ================= RESUME ================= -->
+    <section id="page-resume" class="page" style="display:none;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h6 mb-0">📄 Resume</h2>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      </div>
+      <div class="card p-3 p-md-4 resume-doc" id="resumeDoc"></div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section id="page-settings" class="page" style="display:none;">
+      <h2 class="h6 mb-3">⚙️ Settings</h2>
+      <div class="card p-3 p-md-4">
+        <div class="row g-3" id="settingsForm"></div>
+        <div class="d-flex gap-2 flex-wrap mt-3">
+          <button class="btn btn-sm btn-navy" onclick="saveSettings()">Save Settings</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="exportBackup()">⬇️ Export My Data</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('importBackupFile').click()">⬆️ Import Backup</button>
+          <input type="file" id="importBackupFile" accept=".json" class="d-none" onchange="importBackupFile(event)">
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============== ADD JOB MODAL ============== -->
+<div class="modal fade" id="addJobModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Add a Job You Found</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-secondary">Paste details from the real LinkedIn / Indeed / hospital posting. Leave OPT or Sponsorship as "Not stated" unless the posting explicitly says so — never guess.</p>
+        <div class="row g-2" id="addJobForm"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-teal" onclick="submitAddJob()">Save Job</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== APPLY MODAL ============== -->
+<div class="modal fade" id="applyModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Application Ready</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between border-bottom py-2 small"><span>Hospital</span><b id="am_hospital"></b></div>
+        <div class="d-flex justify-content-between border-bottom py-2 small"><span>Position</span><b id="am_position"></b></div>
+        <div class="d-flex justify-content-between border-bottom py-2 small"><span>Location</span><b id="am_location"></b></div>
+        <div class="d-flex justify-content-between border-bottom py-2 small"><span>Resume</span><span>✅ Mamata_Rawal_ATS_New_Grad_RN_Resume</span></div>
+        <div class="d-flex justify-content-between border-bottom py-2 small"><span>Cover Letter</span><span>✅ Ready</span></div>
+        <div class="d-flex justify-content-between py-2 small"><span>Recruiter</span><span id="am_recruiter"></span></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-navy" onclick="confirmApply()">Open Application</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== TEXT MODAL (message / cover letter) ============== -->
+<div class="modal fade" id="textModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title" id="textModalTitle">Message</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-secondary" id="textModalSub"></p>
+        <textarea id="textModalArea" class="form-control" style="min-height:280px;font-size:12.5px;" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-teal" onclick="copyTextModal()">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-custom" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* =========================================================================
+   STATE / STORAGE KEYS
+   ========================================================================= */
+const LS = {
+  jobs:'rnja_jobs', savedJobs:'rnja_savedJobs', applications:'rnja_applications',
+  resume:'rnja_resume', settings:'rnja_settings', notes:'rnja_notes',
+  followUpDates:'rnja_followUpDates'
+};
+
+const DEFAULT_SETTINGS = {
+  name:"Mamata Rawal", email:"rawalmamata2027@gmail.com", phone:"341-758-1062",
+  graduation:"December 2026", university:"University of Louisiana Monroe",
+  degree:"BSN", targetRole:"New Grad RN", targetStates:"LA, TX, GA, TN, SC, MI, MO",
+  optStatus:"F-1 OPT", sponsorshipPref:"EB-3 preferred"
+};
+
+const RESUME_TEXT = {
+  name:"MAMATA RAWAL",
+  contact:"Monroe, LA 71203 | 341-758-1062 | rawalmamata2027@gmail.com",
+  summary:"BSN student at the University of Louisiana Monroe with expected graduation in December 2026 and clinical experience across medical-surgical, labor and delivery, intensive care, emergency, behavioral health, and skilled nursing settings. Experienced in patient assessment, vital signs, medication administration, IV therapy, blood glucose monitoring, EKGs, care planning, documentation, ADL assistance, and therapeutic communication. BLS and NIHSS certified with Epic/EHR proficiency.",
+  education:[{school:"University of Louisiana Monroe",loc:"Monroe, LA",degree:"Bachelor of Science in Nursing (BSN) — Kitty DeGree School of Nursing",date:"Expected December 2026"}],
+  certifications:["Basic Life Support (BLS), American Heart Association — Expires January 2028","NIHSS Stroke Scale Certification — Expires July 2028"],
+  clinical:[
+    {org:"St. Francis Medical Center",loc:"Monroe, LA",role:"Student Nurse",date:"September 2024 – April 2026",bullets:[
+      "Med-Surg: Provided direct patient care for up to 4 patients; performed head-to-toe assessments, developed individualized care plans, administered medications, managed IV pumps, recorded vital signs, documented on the MAR, and performed blood glucose assessments.",
+      "Labor & Delivery: Assessed vital signs; administered medications and IV fluids; initiated and discontinued IV catheters; assessed fundal height; performed newborn assessments and fetal heart rate monitoring; assisted in deliveries and provided postpartum care.",
+      "ICU: Inserted Foley catheters and administered medications.",
+      "Emergency Department: Performed 12-lead EKGs and administered medications."
+    ]},
+    {org:"Ochsner LSU Health",loc:"Monroe, LA",role:"Student Nurse — Behavioral Health",date:"",bullets:["Practiced therapeutic communication and conducted vital sign and safety assessments."]},
+    {org:"Landmark Nursing & Rehabilitation Center",loc:"West Monroe, LA",role:"Student Nurse",date:"",bullets:["Performed vital sign checks, head-to-toe assessments, ADL assistance, and medication administration."]}
+  ],
+  additional:[
+    {org:"IT Front Desk Helper",date:"June 2022 – Present",bullets:["Assist library users with computer-related technical issues and perform routine printer maintenance."]},
+    {org:"Research/Data Assistant, Emerging Program",date:"August 2022 – December 2023",bullets:["Assisted a psychology professor in organizing and entering survey data efficiently using Microsoft Excel."]}
+  ],
+  volunteer:[
+    "Administered flu vaccinations to healthcare workers at St. Francis Medical Center.",
+    "Provided caregiving support, including medication assistance and ADLs, for a patient recovering from back surgery."
+  ],
+  affiliations:["Student Nurse Association (SNA) — Member","Nepalese Student Association — Member","Assessment & Evaluation Committee (A&E) — Member"],
+  skills:{
+    clinical:["Patient assessment","Vital signs","Medication administration","IV therapy","IV pump management","Blood glucose assessment","EKGs","Foley catheter insertion","Fetal heart rate monitoring","Newborn assessment","Postpartum care","ADL assistance","Therapeutic communication","Care planning","EHR/MAR documentation","BSN","New graduate"],
+    technology:["Epic","EHR","Microsoft Excel"],
+    languages:["English","Nepali","Hindi"]
+  }
+};
+
+/* Real, working live-search links (not fabricated jobs — these hit the site's own current results) */
+const SEARCH_LINKS = [
+  {name:"LinkedIn Jobs", note:"New Grad RN Residency, US, posted last 7 days", url:"https://www.linkedin.com/jobs/search/?keywords=New%20Grad%20RN%20Residency&location=United%20States&f_TPR=r604800"},
+  {name:"Indeed", note:"New Grad RN Residency, US, posted last 7 days", url:"https://www.indeed.com/jobs?q=new+grad+RN+residency&l=United+States&fromage=7"},
+  {name:"Glassdoor", note:"New Grad RN Residency jobs", url:"https://www.glassdoor.com/Job/jobs.htm?sc.keyword=New%20Grad%20RN%20Residency"},
+  {name:"Nurse.com Jobs", note:"Nursing-specific board", url:"https://www.nurse.com/jobs/search/?q=new+grad+rn+residency"},
+  {name:"Health eCareers", note:"Healthcare-specific board", url:"https://www.healthecareers.com/jobs?q=new+grad+rn+residency"},
+  {name:"ZipRecruiter", note:"General board, filter by hospital", url:"https://www.ziprecruiter.com/candidate/search?search=new+grad+rn+residency"}
+];
+
+/* =========================================================================
+   PERSISTENCE
+   ========================================================================= */
+function load(key, fallback){ try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; } }
+function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+let jobs = load(LS.jobs, []); // starts empty — no fabricated demo jobs
+let savedJobIds = load(LS.savedJobs, []);
+let applications = load(LS.applications, []);
+let settings = Object.assign({}, DEFAULT_SETTINGS, load(LS.settings, {}));
+let notes = load(LS.notes, {});
+let followUpDates = load(LS.followUpDates, {});
+save(LS.resume, RESUME_TEXT);
+
+/* =========================================================================
+   SCORING
+   ========================================================================= */
+function computeScore(job){
+  let score = 0;
+  const pos = (job.position||'').toLowerCase();
+  if(pos.includes('new grad') || pos.includes('residency')) score += 25;
+  const cohort = (job.cohort||'').toLowerCase();
+  if(cohort.includes('december 2026') || cohort.includes('dec 2026') || cohort.includes('spring 2027') || cohort.includes('january 2027')) score += 20;
+  if(job.optStatus === 'Explicit') score += 20;
+  if(job.sponsorshipStatus === 'Explicit') score += 20;
+  if((job.requirements||[]).some(r => r.toLowerCase().includes('bsn'))) score += 10;
+  if(job.employmentType === 'Full-time') score += 5;
+  return Math.min(score, 100);
+}
+function matchTier(score){
+  if(score >= 90) return {label:'🔥 Excellent', cls:'match-excellent'};
+  if(score >= 80) return {label:'🟢 Strong', cls:'match-strong'};
+  if(score >= 70) return {label:'🟡 Possible', cls:'match-possible'};
+  return {label:'⚪ Low', cls:'match-low'};
+}
+
+/* =========================================================================
+   NAV
+   ========================================================================= */
+const NAV_ITEMS = [
+  ['dashboard','🏠','Dashboard'], ['findjobs','🔎','Find Live Jobs'], ['newjobs','🆕','Tracked Jobs'],
+  ['matches','🎯','Best Matches'], ['saved','⭐','Saved Jobs'], ['applications','📋','Applications'],
+  ['recruiters','👥','Recruiters'], ['resume','📄','Resume'], ['settings','⚙️','Settings']
+];
+const PAGE_TITLES = {
+  dashboard:["🩺 Mamata's New Grad RN Job Agent","December 2026 BSN • F-1 OPT • New Grad RN Search"],
+  findjobs:["Find Live Jobs","Real search links to LinkedIn, Indeed, and other boards"],
+  newjobs:["Tracked Jobs","Jobs you've added and are actively considering"],
+  matches:["Best Matches","Jobs scoring 80% or higher"],
+  saved:["Saved Jobs","Jobs you've bookmarked for later"],
+  applications:["Application Tracker","Track status across every application"],
+  recruiters:["Recruiters","Contacts tied to tracked jobs"],
+  resume:["Resume","Preview, print, or save your ATS resume"],
+  settings:["Settings","Your profile and search preferences"]
+};
+function renderNav(){
+  [['navListDesktop',''],['navListMobile','offcanvas-']].forEach(([id])=>{
+    document.getElementById(id).innerHTML = NAV_ITEMS.map(([key,icon,label])=>
+      `<a href="#" class="nav-link custom ${key==='dashboard'?'active':''}" data-page="${key}" onclick="goPage('${key}');return false;"><span>${icon}</span>${label}</a>`
+    ).join('');
+  });
+}
+function goPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.getElementById('page-'+page).style.display='block';
+  document.querySelectorAll('.nav-link.custom').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[page][0];
+  document.getElementById('pageSub').textContent = PAGE_TITLES[page][1];
+  const oc = bootstrap.Offcanvas.getInstance(document.getElementById('sidebarOffcanvas'));
+  if(oc) oc.hide();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+/* =========================================================================
+   TOAST / ESCAPE
+   ========================================================================= */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function escapeHTML(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* =========================================================================
+   JOB CARD
+   ========================================================================= */
+function jobCardHTML(job){
+  const score = computeScore(job);
+  const tier = matchTier(score);
+  const isSaved = savedJobIds.includes(job.id);
+  const app = applications.find(a=>a.jobId===job.id);
+  const optLine = job.optStatus === 'Explicit' ? `<span class="status-ok">✅ Explicitly accepted</span>` : `<span class="status-warn">⚠️ OPT not verified</span>`;
+  const sponsorLine = job.sponsorshipStatus === 'Explicit' ? `<span class="status-ok">✅ ${escapeHTML(job.sponsorshipType || 'Sponsorship confirmed')}</span>` : `<span class="status-warn">⚠️ Sponsorship not verified</span>`;
+  const evidence = job.sponsorshipEvidence ? `<div class="evidence mb-2">"${escapeHTML(job.sponsorshipEvidence)}"</div>` : '';
+  const recruiterBlock = job.recruiterName ? `<div class="recruiter-mini mb-2"><b>${escapeHTML(job.recruiterName)}</b><br>${escapeHTML(job.recruiterTitle||'')}</div>` : `<div class="recruiter-mini mb-2 text-secondary">Recruiter not verified</div>`;
+
+  return `
+  <div class="col">
+  <div class="card h-100 p-3 job-card position-relative">
+    ${job.source && job.source!=='Manual' ? `<span class="badge pill-info badge-source">${escapeHTML(job.source)}</span>` : ''}
+    <span class="badge-match badge ${tier.cls} mb-2 align-self-start">${tier.label} ${score}%</span>
+    <p class="fw-bold mb-0" style="font-size:15px;">${escapeHTML(job.position)}</p>
+    <div class="job-hospital mb-2">${escapeHTML(job.hospital)}</div>
+    <div class="d-flex flex-wrap gap-2 small text-secondary mb-2">
+      <span>📍 ${escapeHTML(job.location)}</span><span>🏥 ${escapeHTML(job.department)}</span><span>📅 ${escapeHTML(job.cohort)}</span>
+    </div>
+    <div class="small mb-2">
+      <div>OPT: ${optLine}</div>
+      <div>Sponsorship: ${sponsorLine}</div>
+    </div>
+    ${evidence}
+    ${recruiterBlock}
+    <div class="d-flex flex-wrap gap-1 mb-1">
+      <a class="btn btn-outline-secondary btn-sm" href="${job.jobUrl||'#'}" target="_blank" rel="noopener">View Job</a>
+      <button class="btn btn-navy btn-sm" onclick="startApply(${job.id})" ${app && app.status!=='New'?'disabled':''}>${app? 'Applied ✓':'Apply'}</button>
+      ${job.recruiterLinkedIn ? `<a class="btn btn-outline-secondary btn-sm" href="${job.recruiterLinkedIn}" target="_blank" rel="noopener">LinkedIn</a>` : `<button class="btn btn-outline-secondary btn-sm" disabled>LinkedIn n/a</button>`}
+      ${job.recruiterEmail ? `<button class="btn btn-outline-secondary btn-sm" onclick="emailRecruiter(${job.id})">Email</button>` : `<button class="btn btn-outline-secondary btn-sm" disabled>Email n/a</button>`}
+      <button class="btn ${isSaved?'btn-danger':'btn-outline-secondary'} btn-sm" onclick="toggleSave(${job.id})">${isSaved?'Remove':'Save'}</button>
+    </div>
+    <div class="d-flex flex-wrap gap-1">
+      <button class="btn btn-teal btn-sm" onclick="generateMessage(${job.id})">✉️ Message</button>
+      <button class="btn btn-teal btn-sm" onclick="generateCoverLetter(${job.id})">📝 Cover Letter</button>
+      <button class="btn btn-outline-danger btn-sm" onclick="deleteJob(${job.id})">🗑️</button>
+    </div>
+  </div>
+  </div>`;
+}
+function emptyState(msg){ return `<div class="col-12 text-center text-secondary py-5"><div style="font-size:34px;">🗂️</div>${msg}</div>`; }
+
+/* =========================================================================
+   FILTERS
+   ========================================================================= */
+function populateFilterOptions(){
+  fillSelect('fState', [...new Set(jobs.map(j=>j.state).filter(Boolean))].sort());
+  fillSelect('fDept', [...new Set(jobs.map(j=>j.department).filter(Boolean))].sort());
+  fillSelect('fCohort', [...new Set(jobs.map(j=>j.cohort).filter(Boolean))].sort());
+}
+function fillSelect(id, values){
+  const el = document.getElementById(id); const current = el.value;
+  el.querySelectorAll('option:not(:first-child)').forEach(o=>o.remove());
+  values.forEach(v=>{ const opt=document.createElement('option'); opt.value=v; opt.textContent=v; el.appendChild(opt); });
+  if(values.includes(current)) el.value = current;
+}
+function getFilteredJobs(){
+  const q=(document.getElementById('searchBox').value||'').toLowerCase();
+  const st=document.getElementById('fState').value, dept=document.getElementById('fDept').value, cohort=document.getElementById('fCohort').value;
+  const optF=document.getElementById('fOpt').value, spF=document.getElementById('fSponsor').value;
+  const minScore=parseInt(document.getElementById('fScore').value||'0',10);
+  const strict=document.getElementById('strictToggle').checked;
+  return jobs.filter(j=>{
+    if(q && !(`${j.hospital} ${j.position} ${j.location} ${j.state}`.toLowerCase().includes(q))) return false;
+    if(st && j.state!==st) return false;
+    if(dept && j.department!==dept) return false;
+    if(cohort && j.cohort!==cohort) return false;
+    if(optF && j.optStatus!==optF) return false;
+    if(spF && j.sponsorshipStatus!==spF) return false;
+    if(computeScore(j)<minScore) return false;
+    if(strict && !(j.optStatus==='Explicit' && j.sponsorshipStatus==='Explicit')) return false;
+    return true;
+  }).sort((a,b)=>computeScore(b)-computeScore(a));
+}
+
+/* =========================================================================
+   MAIN RENDER
+   ========================================================================= */
+function renderAll(){
+  renderStats(); renderNewJobs(); renderMatches(); renderSaved();
+  renderDashboard(); renderApplications(); renderRecruiters();
+}
+function renderStats(){
+  const strong = jobs.filter(j=>computeScore(j)>=80).length;
+  const optSpon = jobs.filter(j=>j.optStatus==='Explicit' && j.sponsorshipStatus==='Explicit').length;
+  const submitted = applications.filter(a=>a.status!=='New' && a.status!=='Ready to Apply').length;
+  const interviews = applications.filter(a=>a.status==='Interview').length;
+  document.getElementById('statNew').textContent = jobs.filter(j=>j.status==='New').length;
+  document.getElementById('statStrong').textContent = strong;
+  document.getElementById('statOptSpon').textContent = optSpon;
+  document.getElementById('statReady').textContent = jobs.length;
+  document.getElementById('statSubmitted').textContent = submitted;
+  document.getElementById('statInterview').textContent = interviews;
+  document.getElementById('lastUpdated').textContent = new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+}
+function renderDashboard(){
+  const top = [...jobs].sort((a,b)=>computeScore(b)-computeScore(a)).slice(0,3);
+  document.getElementById('dashTopMatches').innerHTML = top.map(jobCardHTML).join('') || emptyState('No jobs yet — go to Find Live Jobs, then Add Job.');
+  const recent = [...jobs].sort((a,b)=> new Date(b.postedDate||0) - new Date(a.postedDate||0)).slice(0,3);
+  document.getElementById('dashRecent').innerHTML = recent.map(jobCardHTML).join('') || emptyState('Nothing tracked yet.');
+}
+function renderNewJobs(){
+  document.getElementById('newJobsGrid').innerHTML = getFilteredJobs().map(jobCardHTML).join('') || emptyState('No jobs match — try Add Job or adjust filters.');
+}
+function renderMatches(){
+  const list = jobs.filter(j=>computeScore(j)>=80).sort((a,b)=>computeScore(b)-computeScore(a));
+  document.getElementById('matchesGrid').innerHTML = list.map(jobCardHTML).join('') || emptyState('No 80%+ matches yet.');
+}
+function renderSaved(){
+  document.getElementById('savedGrid').innerHTML = jobs.filter(j=>savedJobIds.includes(j.id)).map(jobCardHTML).join('') || emptyState('No saved jobs yet.');
+}
+function renderRecruiters(){
+  const withRec = jobs.filter(j=>j.recruiterName);
+  const html = withRec.map(j=>`
+    <div class="col"><div class="card h-100 p-3">
+      <p class="fw-bold mb-0">${escapeHTML(j.recruiterName)}</p>
+      <div class="job-hospital mb-2">${escapeHTML(j.recruiterTitle||'')}</div>
+      <div class="small text-secondary mb-2">🏥 ${escapeHTML(j.hospital)}</div>
+      <div class="recruiter-mini mb-2">Position: ${escapeHTML(j.position)}</div>
+      <div class="d-flex flex-wrap gap-1">
+        ${j.recruiterLinkedIn ? `<a class="btn btn-outline-secondary btn-sm" href="${j.recruiterLinkedIn}" target="_blank" rel="noopener">Open LinkedIn</a>` : `<button class="btn btn-outline-secondary btn-sm" disabled>LinkedIn not verified</button>`}
+        ${j.recruiterEmail ? `<button class="btn btn-outline-secondary btn-sm" onclick="emailRecruiter(${j.id})">Email</button>` : `<button class="btn btn-outline-secondary btn-sm" disabled>Email not found</button>`}
+        <button class="btn btn-outline-secondary btn-sm" onclick="copyText('${escapeHTML(j.recruiterEmail||'')}','Email')" ${j.recruiterEmail?'':'disabled'}>Copy Email</button>
+        <button class="btn btn-teal btn-sm" onclick="generateMessage(${j.id})">Message</button>
+      </div>
+    </div></div>`).join('');
+  document.getElementById('recruitersGrid').innerHTML = html || emptyState('No recruiter contacts on tracked jobs yet.');
+}
+function renderSearchLinks(){
+  document.getElementById('searchLinksGrid').innerHTML = SEARCH_LINKS.map(s=>`
+    <div class="col"><div class="search-link-card d-flex flex-column">
+      <b>${escapeHTML(s.name)}</b>
+      <span class="small text-secondary mb-3">${escapeHTML(s.note)}</span>
+      <a class="btn btn-navy btn-sm mt-auto" href="${s.url}" target="_blank" rel="noopener">Search on ${escapeHTML(s.name)} →</a>
+    </div></div>`).join('');
+}
+
+/* =========================================================================
+   SAVE / DELETE / APPLY
+   ========================================================================= */
+function toggleSave(jobId){
+  if(savedJobIds.includes(jobId)){ savedJobIds=savedJobIds.filter(id=>id!==jobId); toast('Removed from saved jobs'); }
+  else{ savedJobIds.push(jobId); toast('Job saved'); }
+  save(LS.savedJobs, savedJobIds); renderAll();
+}
+function deleteJob(jobId){
+  if(!confirm('Remove this job from your tracker?')) return;
+  jobs = jobs.filter(j=>j.id!==jobId);
+  savedJobIds = savedJobIds.filter(id=>id!==jobId);
+  applications = applications.filter(a=>a.jobId!==jobId);
+  save(LS.jobs, jobs); save(LS.savedJobs, savedJobIds); save(LS.applications, applications);
+  populateFilterOptions(); renderAll(); toast('Job removed');
+}
+let pendingApplyJobId = null;
+function startApply(jobId){
+  const job = jobs.find(j=>j.id===jobId);
+  pendingApplyJobId = jobId;
+  document.getElementById('am_hospital').textContent = job.hospital;
+  document.getElementById('am_position').textContent = job.position;
+  document.getElementById('am_location').textContent = job.location;
+  document.getElementById('am_recruiter').textContent = job.recruiterName ? `✅ Found — ${job.recruiterName}` : '⚠️ Not found';
+  new bootstrap.Modal(document.getElementById('applyModal')).show();
+}
+function confirmApply(){
+  const job = jobs.find(j=>j.id===pendingApplyJobId);
+  if(!job) return;
+  window.open(job.applicationUrl || job.jobUrl || '#', '_blank', 'noopener');
+  let app = applications.find(a=>a.jobId===job.id);
+  if(!app){ app = {jobId: job.id, appliedDate: todayISO(), status:'Applied', followUpDate: addDays(todayISO(),7), followedUp:false, notes:''}; applications.push(app); }
+  else{ app.status='Applied'; app.appliedDate=todayISO(); app.followUpDate=addDays(todayISO(),7); }
+  save(LS.applications, applications);
+  bootstrap.Modal.getInstance(document.getElementById('applyModal')).hide();
+  toast('Application opened — marked Applied. Follow up ' + app.followUpDate);
+  renderAll();
+}
+function setAppStatus(jobId, status){
+  let app = applications.find(a=>a.jobId===jobId);
+  if(!app){ app = {jobId, appliedDate: status==='Applied'?todayISO():'', status, followUpDate: status==='Applied'?addDays(todayISO(),7):'', followedUp:false, notes:''}; applications.push(app); }
+  else{ app.status=status; if(status==='Applied' && !app.appliedDate){ app.appliedDate=todayISO(); app.followUpDate=addDays(todayISO(),7); } }
+  save(LS.applications, applications); renderAll();
+}
+function markFollowedUp(jobId){
+  const app = applications.find(a=>a.jobId===jobId);
+  if(app){ app.followedUp=true; save(LS.applications, applications); renderApplications(); toast('Marked as followed up'); }
+}
+function updateNotes(jobId, val){
+  const app = applications.find(a=>a.jobId===jobId);
+  if(app){ app.notes=val; save(LS.applications, applications); }
+}
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function addDays(iso, n){ const d=new Date(iso); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+
+function renderApplications(){
+  const rows = applications.map(app=>{
+    const job = jobs.find(j=>j.id===app.jobId);
+    if(!job) return '';
+    return `<tr>
+      <td>${escapeHTML(job.hospital)}</td><td>${escapeHTML(job.position)}</td><td>${escapeHTML(job.location)}</td>
+      <td>${escapeHTML(app.appliedDate||'—')}</td>
+      <td><select class="form-select form-select-sm" onchange="setAppStatus(${job.id}, this.value)">
+        ${['New','Ready to Apply','Applied','Follow-up','Interview','Offer','Rejected','Withdrawn'].map(s=>`<option value="${s}" ${app.status===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>
+      <td>${escapeHTML(job.recruiterName||'Not verified')}</td>
+      <td>${app.followUpDate ? `📅 ${app.followUpDate} ${app.followedUp ? '✅' : `<button class="btn btn-outline-secondary btn-sm mt-1" onclick="markFollowedUp(${job.id})">Mark Followed Up</button>`}` : '—'}</td>
+      <td><input type="text" class="form-control form-control-sm" style="min-width:120px;" value="${escapeHTML(app.notes||'')}" placeholder="Notes..." onchange="updateNotes(${job.id}, this.value)"></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('appsTableBody').innerHTML = rows || `<tr><td colspan="8" class="text-center text-secondary py-4">No applications yet — apply to a job to start tracking it here.</td></tr>`;
+}
+
+/* =========================================================================
+   MESSAGE / COVER LETTER / EMAIL
+   ========================================================================= */
+function generateMessage(jobId){
+  const job = jobs.find(j=>j.id===jobId); const s = settings;
+  const recruiterName = job.recruiterName || 'Hiring Team';
+  const body = `Subject: New Grad RN Opportunity — ${job.hospital}
+
+Hello ${recruiterName},
+
+My name is ${s.name}, and I am a BSN student at ${s.university} graduating in ${s.graduation}. I am very interested in the ${job.position} opportunity at ${job.hospital}.
+
+I would appreciate any guidance regarding the application timeline and eligibility for ${s.graduation} graduates. I am also interested in learning more about your RN residency program and the OPT/sponsorship process.
+
+Thank you for your time. I would be grateful to connect.
+
+Best,
+${s.name}
+BSN Candidate
+${s.university}
+Expected Graduation: ${s.graduation}`;
+  showTextModal('Message — ' + job.hospital, 'Copy this and send it via LinkedIn or email — nothing is sent automatically.', body);
+}
+function generateCoverLetter(jobId){
+  const job = jobs.find(j=>j.id===jobId); const s = settings;
+  const body = `${s.name}
+${s.university} — ${s.degree} Candidate
+${s.email} | ${s.phone}
+
+${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+
+Hiring Team
+${job.hospital}
+
+Re: ${job.position} — ${job.department}, ${job.location}
+
+Dear Hiring Team,
+
+I am writing to apply for the ${job.position} position in ${job.department} at ${job.hospital}. I am a BSN candidate at ${s.university}, expecting to graduate in ${s.graduation}, and I am eager to begin my nursing career as part of your new graduate residency program.
+
+During my clinical rotations, I provided direct patient care across medical-surgical, labor and delivery, intensive care, emergency, and behavioral health settings. I have hands-on experience with patient assessment, medication administration, IV therapy, blood glucose monitoring, EKGs, and EHR/MAR documentation using Epic, along with therapeutic communication and care planning. I hold current BLS and NIHSS certifications.
+
+I am confident that my clinical background and commitment to patient-centered care make me a strong fit for the ${job.position} role at ${job.hospital}, and I would welcome the opportunity to discuss how I can contribute to your team.
+
+Thank you for your time and consideration.
+
+Sincerely,
+${s.name}`;
+  showTextModal('Cover Letter — ' + job.hospital, 'Use Print or Copy to save this as a PDF.', body);
+}
+function showTextModal(title, sub, body){
+  document.getElementById('textModalTitle').textContent = title;
+  document.getElementById('textModalSub').textContent = sub;
+  document.getElementById('textModalArea').value = body;
+  new bootstrap.Modal(document.getElementById('textModal')).show();
+}
+function copyTextModal(){
+  const area = document.getElementById('textModalArea'); area.select();
+  navigator.clipboard && navigator.clipboard.writeText(area.value).then(()=>toast('Copied to clipboard')).catch(()=>toast('Copy failed — select and copy manually'));
+}
+function copyText(text, label){
+  if(!text){ toast(label + ' not available'); return; }
+  navigator.clipboard && navigator.clipboard.writeText(text).then(()=>toast(label + ' copied')).catch(()=>toast('Copy failed'));
+}
+function emailRecruiter(jobId){
+  const job = jobs.find(j=>j.id===jobId);
+  if(!job.recruiterEmail){ toast('Recruiter email not available.'); return; }
+  const s = settings;
+  const subject = encodeURIComponent(`New Grad RN Opportunity — ${job.hospital}`);
+  const body = encodeURIComponent(`Hello ${job.recruiterName||'Hiring Team'},\n\nMy name is ${s.name}, and I am a BSN student at ${s.university} graduating in ${s.graduation}. I am very interested in the ${job.position} opportunity at ${job.hospital}.\n\nI would appreciate any guidance regarding the application timeline and eligibility for ${s.graduation} graduates. I am also interested in learning more about your RN residency program and the OPT/sponsorship process.\n\nThank you for your time. I would be grateful to connect.\n\nBest,\n${s.name}\nBSN Candidate\n${s.university}\nExpected Graduation: ${s.graduation}`);
+  window.location.href = `mailto:${job.recruiterEmail}?subject=${subject}&body=${body}`;
+}
+
+/* =========================================================================
+   ADD JOB (manual — for real postings the user found themselves)
+   ========================================================================= */
+const ADD_JOB_FIELDS = [
+  ['hospital','Hospital / System *','text',12],['position','Position Title *','text',12],
+  ['location','City, State','text',6],['state','State','text',6],
+  ['department','Department','text',6],['cohort','Cohort (e.g. Spring 2027)','text',6],
+  ['employmentType','Employment Type','select:Full-time,Part-time',6],
+  ['optStatus','OPT Status','select:Not stated,Explicit',6],
+  ['sponsorshipStatus','Sponsorship Status','select:Not stated,Explicit',6],
+  ['sponsorshipType','Sponsorship Type (e.g. EB-3)','text',6],
+  ['sponsorshipEvidence','Sponsorship/OPT evidence — paste exact wording from the posting','textarea',12],
+  ['jobUrl','Job Posting URL','text',12],['applicationUrl','Application URL (if different)','text',12],
+  ['recruiterName','Recruiter Name (leave blank if unknown)','text',6],['recruiterTitle','Recruiter Title','text',6],
+  ['recruiterLinkedIn','Recruiter LinkedIn URL','text',6],['recruiterEmail','Recruiter Email','text',6]
+];
+function openAddJobModal(){
+  document.getElementById('addJobForm').innerHTML = ADD_JOB_FIELDS.map(([key,label,type,col])=>{
+    let input;
+    if(type==='textarea') input = `<textarea class="form-control form-control-sm" id="add_${key}" rows="2"></textarea>`;
+    else if(type.startsWith('select:')) input = `<select class="form-select form-select-sm" id="add_${key}">${type.slice(7).split(',').map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
+    else input = `<input type="text" class="form-control form-control-sm" id="add_${key}">`;
+    return `<div class="col-md-${col}"><label class="form-label small mb-1">${label}</label>${input}</div>`;
+  }).join('');
+  new bootstrap.Modal(document.getElementById('addJobModal')).show();
+}
+function submitAddJob(){
+  const get = k => document.getElementById('add_'+k).value.trim();
+  const hospital = get('hospital'), position = get('position');
+  if(!hospital || !position){ toast('Hospital and Position are required'); return; }
+  const maxId = jobs.reduce((m,j)=>Math.max(m,j.id),0);
+  const job = {
+    id: maxId+1, source:'Manual', status:'New',
+    hospital, position, location:get('location'), state:get('state'), department:get('department'),
+    cohort:get('cohort'), employmentType:get('employmentType')||'Full-time',
+    optStatus:get('optStatus')||'Not stated', sponsorshipStatus:get('sponsorshipStatus')||'Not stated',
+    sponsorshipType:get('sponsorshipType'), sponsorshipEvidence:get('sponsorshipEvidence'),
+    jobUrl:get('jobUrl'), applicationUrl:get('applicationUrl')||get('jobUrl'),
+    recruiterName:get('recruiterName'), recruiterTitle:get('recruiterTitle'),
+    recruiterLinkedIn:get('recruiterLinkedIn'), recruiterEmail:get('recruiterEmail'),
+    description:'', requirements: get('degree')? [] : [], postedDate: todayISO()
+  };
+  jobs.push(job); save(LS.jobs, jobs);
+  populateFilterOptions(); renderAll();
+  bootstrap.Modal.getInstance(document.getElementById('addJobModal')).hide();
+  toast('Job added to your tracker');
+}
+
+/* =========================================================================
+   IMPORT / EXPORT
+   ========================================================================= */
+function exportJobsJSON(){ downloadJSON(jobs, 'rn-jobs-export.json'); }
+function importJobsFile(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      const incoming = Array.isArray(data) ? data : (data.jobs || []);
+      let maxId = jobs.reduce((m,j)=>Math.max(m,j.id),0);
+      incoming.forEach(j=>{
+        if(!j.id || jobs.some(existing=>existing.id===j.id)) j.id = ++maxId;
+        if(!j.source) j.source = 'Imported';
+        if(!j.status) j.status = 'New';
+        jobs.push(j);
+      });
+      save(LS.jobs, jobs); populateFilterOptions(); renderAll();
+      toast(`Imported ${incoming.length} job(s)`);
+    }catch(err){ toast('Import failed — invalid JSON file'); }
+  };
+  reader.readAsText(file); evt.target.value = '';
+}
+function downloadJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+function exportBackup(){
+  downloadJSON({jobs, savedJobs:savedJobIds, applications, settings, notes, followUpDates, exportedAt:new Date().toISOString()}, 'rn-job-agent-backup.json');
+  toast('Backup downloaded');
+}
+function importBackupFile(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(data.jobs) jobs = data.jobs;
+      if(data.savedJobs) savedJobIds = data.savedJobs;
+      if(data.applications) applications = data.applications;
+      if(data.settings) settings = Object.assign({}, DEFAULT_SETTINGS, data.settings);
+      if(data.notes) notes = data.notes;
+      if(data.followUpDates) followUpDates = data.followUpDates;
+      save(LS.jobs, jobs); save(LS.savedJobs, savedJobIds); save(LS.applications, applications);
+      save(LS.settings, settings); save(LS.notes, notes); save(LS.followUpDates, followUpDates);
+      populateFilterOptions(); renderSettingsForm(); renderAll();
+      toast('Backup restored');
+    }catch(err){ toast('Import failed — invalid backup file'); }
+  };
+  reader.readAsText(file); evt.target.value = '';
+}
+
+/* =========================================================================
+   SETTINGS
+   ========================================================================= */
+const SETTINGS_FIELDS = [
+  ['name','Name'], ['email','Email'], ['phone','Phone'], ['graduation','Graduation Date'],
+  ['university','University'], ['degree','Degree'], ['targetRole','Target Role'],
+  ['targetStates','Target States'], ['optStatus','OPT Status'], ['sponsorshipPref','Sponsorship Preference']
+];
+function renderSettingsForm(){
+  document.getElementById('settingsForm').innerHTML = SETTINGS_FIELDS.map(([key,label])=>`
+    <div class="col-md-6">
+      <label class="form-label small mb-1">${label}</label>
+      <input type="text" class="form-control form-control-sm" id="set_${key}" value="${escapeHTML(settings[key]||'')}">
+    </div>`).join('');
+}
+function saveSettings(){
+  SETTINGS_FIELDS.forEach(([key])=>{ settings[key] = document.getElementById('set_'+key).value; });
+  save(LS.settings, settings); toast('Settings saved');
+}
+
+/* =========================================================================
+   RESUME RENDER
+   ========================================================================= */
+function renderResume(){
+  const r = RESUME_TEXT;
+  let html = `<h2>${r.name}</h2><div class="text-secondary small mb-2">${r.contact}</div>`;
+  html += `<h4>Professional Summary</h4><p class="small">${r.summary}</p>`;
+  html += `<h4>Education</h4>`;
+  r.education.forEach(e=>{ html += `<div class="job-line"><span>${e.school} <span class="job-loc">— ${e.loc}</span></span><span>${e.date}</span></div><div class="small">${e.degree}</div>`; });
+  html += `<h4>Certifications</h4><ul class="small">${r.certifications.map(c=>`<li>${c}</li>`).join('')}</ul>`;
+  html += `<h4>Clinical Experience</h4>`;
+  r.clinical.forEach(c=>{ html += `<div class="job-line"><span>${c.org} <span class="job-loc">— ${c.loc}</span></span><span>${c.date}</span></div><div class="small">${c.role}</div><ul class="small">${c.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`; });
+  html += `<h4>Additional Experience</h4>`;
+  r.additional.forEach(c=>{ html += `<div class="job-line"><span>${c.org}</span><span>${c.date}</span></div><ul class="small">${c.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`; });
+  html += `<h4>Volunteer Experience</h4><ul class="small">${r.volunteer.map(v=>`<li>${v}</li>`).join('')}</ul>`;
+  html += `<h4>Professional Affiliations</h4><ul class="small">${r.affiliations.map(a=>`<li>${a}</li>`).join('')}</ul>`;
+  html += `<h4>Skills</h4><p class="small"><b>Clinical:</b> ${r.skills.clinical.join(', ')}</p><p class="small"><b>Technology:</b> ${r.skills.technology.join(', ')}</p><p class="small"><b>Languages:</b> ${r.skills.languages.join(', ')}</p>`;
+  document.getElementById('resumeDoc').innerHTML = html;
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+function init(){
+  renderNav();
+  renderSearchLinks();
+  populateFilterOptions();
+  renderSettingsForm();
+  renderResume();
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
